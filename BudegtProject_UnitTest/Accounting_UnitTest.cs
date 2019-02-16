@@ -9,22 +9,28 @@ namespace BudegtProject_UnitTest
     [TestClass]
     public class Accounting_UnitTest
     {
-        private IBudgetRepo _budgetRepo = NSubstitute.Substitute.For<IBudgetRepo>();
+
 
         [TestMethod]
         public void AMonth()
         {
             var startDate = new DateTime(2018, 1, 01);
             var endDate = new DateTime(2018, 1, 31);
-            _budgetRepo.GetAll().Returns(new List<Budget>()
+            var models = new List<Budget>()
             {
                 new Budget() {YearMonth = "201801", Amount = 62},
                 new Budget() {YearMonth = "201802", Amount = 28},
                 new Budget() {YearMonth = "201803", Amount = 0},
                 new Budget() {YearMonth = "201805", Amount = 31},
-            });
-            var accounting = new Accounting(_budgetRepo);
-            Assert.AreEqual(62, accounting.TotalAccoount(startDate, endDate));
+            };
+            var accountinng = CreateAccounting(models);
+            Assert.AreEqual(62, accountinng.TotalAccoount(startDate, endDate));
+        }
+        private Accounting CreateAccounting(IEnumerable<Budget> list)
+        {
+            var _budgetRepo = NSubstitute.Substitute.For<IBudgetRepo>();
+            _budgetRepo.GetAll().Returns(list);
+            return new Accounting(_budgetRepo);
         }
 
         [Ignore]
