@@ -56,15 +56,58 @@ namespace BudegtProject_UnitTest
             {
                 new Budget() {YearMonth = "201803", Amount = 0}
             };
-             BudgetSetup(budgets);
+            BudgetSetup(budgets);
+            Assert.AreEqual(0, _accounting.TotalAccoount(startDate, endDate));
+        }
+
+        [TestMethod]
+        public void NoData()
+        {
+            var startDate = new DateTime(2018, 4, 01);
+            var endDate = new DateTime(2018, 4, 02);
+            var budgets = new List<Budget>() { };
+            BudgetSetup(budgets);
             Assert.AreEqual(0, _accounting.TotalAccoount(startDate, endDate));
         }
 
         [Ignore]
         [TestMethod]
-        public void NoData()
+        public void AccrossMonth()
         {
-            //BudgetShouldBe(0, new DateTime(2018, 04, 01), new DateTime(2018, 04, 02));
+            // Prepare
+            var startDate = new DateTime(2018, 1, 31);
+            var endDate = new DateTime(2018, 2, 1);
+            var budgets = new List<Budget>()
+            {
+                new Budget(){YearMonth = "201801", Amount = 62},
+                new Budget(){YearMonth = "201802", Amount = 28}
+            };
+            BudgetSetup(budgets);
+
+            // Act
+            double total = _accounting.TotalAccoount(startDate, endDate);
+            
+            // Assert
+            Assert.AreEqual(3, total);
+        }
+
+        [TestMethod]
+        public void TwoDaysInOneMonth()
+        {
+            // Prepare
+            var startDate = new DateTime(2018, 1, 1);
+            var endDate = new DateTime(2018, 1, 2);
+            var budgets = new List<Budget>()
+            {
+                new Budget(){YearMonth = "201801", Amount = 62}
+            };
+            BudgetSetup(budgets);
+
+            // Act
+            double total = _accounting.TotalAccoount(startDate, endDate);
+
+            // Assert
+            Assert.AreEqual(4, total);
         }
 
         private static IBudgetRepo GetBudgetRepo()
