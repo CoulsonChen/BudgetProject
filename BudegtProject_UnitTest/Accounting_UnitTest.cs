@@ -9,8 +9,9 @@ namespace BudegtProject_UnitTest
     [TestClass]
     public class Accounting_UnitTest
     {
-        private IBudgetRepo _budgetRepo = NSubstitute.Substitute.For<IBudgetRepo>();
+        private IBudgetRepo _budgetRepo = Substitute.For<IBudgetRepo>();
         private Accounting _accounting;
+
         [TestInitialize]
         public void TestInit()
         {
@@ -30,6 +31,7 @@ namespace BudegtProject_UnitTest
             BudgetSetup(budgets);
             Assert.AreEqual(62, _accounting.TotalAccoount(startDate, endDate));
         }
+
         [TestMethod]
         public void SingleDate()
         {
@@ -42,11 +44,7 @@ namespace BudegtProject_UnitTest
             BudgetSetup(budgets);
             Assert.AreEqual(2, _accounting.TotalAccoount(startDate, endDate));
         }
-        private void BudgetSetup(IEnumerable<Budget> list)
-        {
-            _budgetRepo.GetAll().Returns(list);
-        }
-
+        
         [TestMethod]
         public void UnvalidDatetime()
         {
@@ -69,8 +67,7 @@ namespace BudegtProject_UnitTest
             BudgetSetup(budgets);
             Assert.AreEqual(0, _accounting.TotalAccoount(startDate, endDate));
         }
-
-        [Ignore]
+        
         [TestMethod]
         public void AccrossMonth()
         {
@@ -92,6 +89,67 @@ namespace BudegtProject_UnitTest
         }
 
         [TestMethod]
+        public void AccrossMonth_WithZeroBudget()
+        {
+            // Prepare
+            var startDate = new DateTime(2018, 2, 28);
+            var endDate = new DateTime(2018, 3, 1);
+            var budgets = new List<Budget>()
+            {
+                new Budget(){YearMonth = "201802", Amount = 28},
+                new Budget(){YearMonth = "201803", Amount = 0}
+            };
+            BudgetSetup(budgets);
+
+            // Act
+            double total = _accounting.TotalAccoount(startDate, endDate);
+
+            // Assert
+            Assert.AreEqual(1, total);
+        }
+
+        [TestMethod]
+        public void AccrossSeveralMonth()
+        {
+            // Prepare
+            var startDate = new DateTime(2018, 1, 31);
+            var endDate = new DateTime(2018, 3, 1);
+            var budgets = new List<Budget>()
+            {
+                new Budget(){YearMonth = "201801", Amount = 62},
+                new Budget(){YearMonth = "201802", Amount = 28},
+                new Budget(){YearMonth = "201803", Amount = 0}
+            };
+            BudgetSetup(budgets);
+
+            // Act
+            double total = _accounting.TotalAccoount(startDate, endDate);
+
+            // Assert
+            Assert.AreEqual(30, total);
+        }
+
+        [TestMethod]
+        public void AccrossMonth_WithNoData()
+        {
+            // Prepare
+            var startDate = new DateTime(2018, 3, 1);
+            var endDate = new DateTime(2018, 5, 1);
+            var budgets = new List<Budget>()
+            {
+                new Budget(){YearMonth = "201803", Amount = 0},
+                new Budget(){YearMonth = "201805", Amount = 31}
+            };
+            BudgetSetup(budgets);
+
+            // Act
+            double total = _accounting.TotalAccoount(startDate, endDate);
+
+            // Assert
+            Assert.AreEqual(1, total);
+        }
+
+        [TestMethod]
         public void TwoDaysInOneMonth()
         {
             // Prepare
@@ -110,11 +168,9 @@ namespace BudegtProject_UnitTest
             Assert.AreEqual(4, total);
         }
 
-        private static IBudgetRepo GetBudgetRepo()
+        private void BudgetSetup(IEnumerable<Budget> list)
         {
-            IBudgetRepo budgetRepo = NSubstitute.Substitute.For<IBudgetRepo>();
-
-            return budgetRepo;
+            _budgetRepo.GetAll().Returns(list);
         }
 
     }
