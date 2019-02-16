@@ -17,7 +17,8 @@ namespace BudgetProject
 
         public double TotalAccoount(DateTime StartDate, DateTime EndDate)
         {
-            return 0;
+            return budgetRepo.GetAll()
+                .FirstOrDefault(x => x.YearMonth == StartDate.ToString("yyyyMM")).Amount;
         }
     }
 }
