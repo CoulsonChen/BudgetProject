@@ -8,6 +8,13 @@ namespace BudgetProject
 {
     public class Accounting
     {
+        private IBudgetRepo budgetRepo;
+
+        public Accounting(IBudgetRepo budgetRepo)
+        {
+            this.budgetRepo = budgetRepo;
+        }
+
         public double TotalAccoount(DateTime StartDate, DateTime EndDate)
         {
             return 0;
