@@ -21,6 +21,7 @@ namespace BudegtProject_UnitTest
         [TestMethod]
         public void AMonth()
         {
+            // Prepare
             var startDate = new DateTime(2018, 1, 01);
             var endDate = new DateTime(2018, 1, 31);
             _budgetRepo.ReturnBudgets = new List<Budget>()
@@ -28,12 +29,17 @@ namespace BudegtProject_UnitTest
                 new Budget() {YearMonth = "201801", Amount = 62}
             };
 
-            Assert.AreEqual(62, _accounting.TotalAccoount(startDate, endDate));
+            // Act
+            double total = _accounting.TotalAccoount(startDate, endDate);
+
+            // Assert
+            Assert.AreEqual(62, total);
         }
 
         [TestMethod]
         public void SingleDate()
         {
+            // Prepare
             var startDate = new DateTime(2018, 1, 01);
             var endDate = new DateTime(2018, 1, 01);
             _budgetRepo.ReturnBudgets = new List<Budget>()
@@ -41,12 +47,17 @@ namespace BudegtProject_UnitTest
                 new Budget() {YearMonth = "201801", Amount = 62},
             };
 
-            Assert.AreEqual(2, _accounting.TotalAccoount(startDate, endDate));
+            // Act
+            double total = _accounting.TotalAccoount(startDate, endDate);
+
+            // Assert
+            Assert.AreEqual(2, total);
         }
 
         [TestMethod]
         public void UnvalidDatetime()
         {
+            // Prepare
             var startDate = new DateTime(2018, 4, 01);
             var endDate = new DateTime(2018, 3, 01);
             _budgetRepo.ReturnBudgets = new List<Budget>()
@@ -54,17 +65,26 @@ namespace BudegtProject_UnitTest
                 new Budget() {YearMonth = "201803", Amount = 0}
             };
 
-            Assert.AreEqual(0, _accounting.TotalAccoount(startDate, endDate));
+            // Act
+            double total = _accounting.TotalAccoount(startDate, endDate);
+
+            // Assert
+            Assert.AreEqual(0, total);
         }
 
         [TestMethod]
         public void NoData()
         {
+            // Prepare
             var startDate = new DateTime(2018, 4, 01);
             var endDate = new DateTime(2018, 4, 02);
             _budgetRepo.ReturnBudgets = new List<Budget>() { };
 
-            Assert.AreEqual(0, _accounting.TotalAccoount(startDate, endDate));
+            // Act
+            double total = _accounting.TotalAccoount(startDate, endDate);
+
+            // Assert
+            Assert.AreEqual(0, total);
         }
 
         [TestMethod]

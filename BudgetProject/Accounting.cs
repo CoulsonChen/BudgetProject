@@ -42,29 +42,35 @@ namespace BudgetProject
                 {
                     if (item.YearMonth == StartDate.ToString("yyyyMM"))
                     {
-                        int dayOfMonth = DateTime.DaysInMonth(StartDate.Year, StartDate.Month);
-                        result += item.Amount * (dayOfMonth - StartDate.Day + 1) / dayOfMonth;
+                        result += StartMonthBudget(StartDate, item.Amount);
                         continue;
                     }
                     else if (item.YearMonth == EndDate.ToString("yyyyMM"))
                     {
-                        int dayOfMonth = DateTime.DaysInMonth(EndDate.Year, EndDate.Month);
-                        result += item.Amount * EndDate.Day / dayOfMonth;
+                        result += EndMonthBudget(EndDate, item.Amount);
                         continue;
                     }
                     else
                     {
                         result += item.Amount;
                     }
-
-
                 }
-
                 return result;
             }
-
         }
-        
+
+        private double StartMonthBudget(DateTime StartDate, int BudgetAmount)
+        {
+            int dayOfMonth = DateTime.DaysInMonth(StartDate.Year, StartDate.Month);
+            return BudgetAmount * (dayOfMonth - StartDate.Day + 1) / dayOfMonth;
+        }
+
+        private double EndMonthBudget(DateTime EndDate, int BudgetAmount)
+        {
+            int dayOfMonth = DateTime.DaysInMonth(EndDate.Year, EndDate.Month);
+            return BudgetAmount * EndDate.Day / dayOfMonth;
+        }
+
         private List<Budget> GetBudgetSet(DateTime StartDate, DateTime EndDate)
         {
             var allBudget = budgetRepo.GetAll();
