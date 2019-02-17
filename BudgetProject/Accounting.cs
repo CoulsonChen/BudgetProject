@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Net.Configuration;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,7 +20,8 @@ namespace BudgetProject
         public double TotalAccoount(DateTime StartDate, DateTime EndDate)
         {
             if (StartDate > EndDate) return 0;
-            var Budget = budgetRepo.GetAll();
+            var Budget = GetBudgetSet(StartDate, EndDate);
+
             if (!Budget.Any())
                 return 0;
 
@@ -85,7 +88,7 @@ namespace BudgetProject
 
                 return result;
             }
-            
+
         }
 
         private int GetYear(string YearMonth)
@@ -96,6 +99,47 @@ namespace BudgetProject
         private int GetMonth(string YearMonth)
         {
             return int.Parse(YearMonth.Substring(4, 2));
+        }
+
+        private List<Budget> GetBudgetSet(DateTime StartDate, DateTime EndDate)
+        {
+            var allBudget = budgetRepo.GetAll();
+            var budgetTimeStampList = GetBudgetTimeStampList(StartDate, EndDate);
+
+            List<Budget> returnBudgets = allBudget.Where(x => budgetTimeStampList.Contains(x.YearMonth)).ToList();
+
+            return returnBudgets;
+        }
+
+        private List<string> GetBudgetTimeStampList(DateTime StartDate, DateTime EndDate)
+        {
+            DateTime timeFlag = StartDate;
+            List<string> returnTimeStamps = new List<string>();
+
+            while (!IsSameMonth(timeFlag, EndDate))
+            {
+                returnTimeStamps.Add(string.Format("{0}{1}"
+                    , timeFlag.Year.ToString(), timeFlag.Month.ToString("d2")));
+
+                timeFlag = timeFlag.AddMonths(1);
+            }
+            returnTimeStamps.Add(string.Format("{0}{1}"
+                , EndDate.Year.ToString(), EndDate.Month.ToString("d2")));
+
+            return returnTimeStamps;
+        }
+
+        private bool IsSameMonth(DateTime StartDate, DateTime EndDate)
+        {
+            if (EndDate.Year - StartDate.Year == 0
+                && EndDate.Month - StartDate.Month == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
