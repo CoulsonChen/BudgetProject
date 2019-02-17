@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Accounting.cs" />
     <Compile Include="Budget.cs" />
+    <Compile Include="BudgetRepo.cs" />
     <Compile Include="IBudgetRepo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
