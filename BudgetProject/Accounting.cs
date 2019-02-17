@@ -20,13 +20,12 @@ namespace BudgetProject
         public double TotalAccoount(DateTime StartDate, DateTime EndDate)
         {
             if (StartDate > EndDate) return 0;
-            var Budget = GetBudgetSet(StartDate, EndDate);
+            var Budgets = GetBudgetSet(StartDate, EndDate);
 
-            if (!Budget.Any())
+            if (!Budgets.Any())
                 return 0;
 
-            if (EndDate.Year - StartDate.Year == 0
-                && EndDate.Month - StartDate.Month == 0)
+            if (IsSameMonth(StartDate, EndDate))
             {
                 double dayOMonth = DateTime.DaysInMonth(StartDate.Year, StartDate.Month);
                 double dayDiff = (EndDate - StartDate).Days + 1;
@@ -38,41 +37,16 @@ namespace BudgetProject
             }
             else
             {
-                List<Budget> suBudgets = new List<Budget>();
-                foreach (var obj in Budget)
-                {
-                    DateTime time = new DateTime(GetYear(obj.YearMonth),
-                        GetMonth(obj.YearMonth), 1);
-                    if (time.Year == StartDate.Year
-                        && time.Month == StartDate.Month)
-                    {
-                        suBudgets.Add(obj);
-                        continue;
-                    }
-                    else if (time.Year == EndDate.Year
-                             && time.Month == EndDate.Month)
-                    {
-                        suBudgets.Add(obj);
-                        continue;
-                    }
-                    if (time >= StartDate && time <= EndDate)
-                    {
-                        suBudgets.Add(obj);
-                    }
-                }
-
                 double result = 0;
-                foreach (var item in suBudgets)
+                foreach (var item in Budgets)
                 {
-                    if (GetYear(item.YearMonth) == StartDate.Year
-                        && GetMonth(item.YearMonth) == StartDate.Month)
+                    if (item.YearMonth == StartDate.ToString("yyyyMM"))
                     {
                         int dayOfMonth = DateTime.DaysInMonth(StartDate.Year, StartDate.Month);
                         result += item.Amount * (dayOfMonth - StartDate.Day + 1) / dayOfMonth;
                         continue;
                     }
-                    else if (GetYear(item.YearMonth) == EndDate.Year
-                             && GetMonth(item.YearMonth) == EndDate.Month)
+                    else if (item.YearMonth == EndDate.ToString("yyyyMM"))
                     {
                         int dayOfMonth = DateTime.DaysInMonth(EndDate.Year, EndDate.Month);
                         result += item.Amount * EndDate.Day / dayOfMonth;
@@ -90,17 +64,7 @@ namespace BudgetProject
             }
 
         }
-
-        private int GetYear(string YearMonth)
-        {
-            return int.Parse(YearMonth.Substring(0, 4));
-        }
-
-        private int GetMonth(string YearMonth)
-        {
-            return int.Parse(YearMonth.Substring(4, 2));
-        }
-
+        
         private List<Budget> GetBudgetSet(DateTime StartDate, DateTime EndDate)
         {
             var allBudget = budgetRepo.GetAll();
@@ -118,13 +82,10 @@ namespace BudgetProject
 
             while (!IsSameMonth(timeFlag, EndDate))
             {
-                returnTimeStamps.Add(string.Format("{0}{1}"
-                    , timeFlag.Year.ToString(), timeFlag.Month.ToString("d2")));
-
+                returnTimeStamps.Add(timeFlag.ToString("yyyyMM"));
                 timeFlag = timeFlag.AddMonths(1);
             }
-            returnTimeStamps.Add(string.Format("{0}{1}"
-                , EndDate.Year.ToString(), EndDate.Month.ToString("d2")));
+            returnTimeStamps.Add(timeFlag.ToString("yyyyMM"));
 
             return returnTimeStamps;
         }
